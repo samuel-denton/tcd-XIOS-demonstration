@@ -6,10 +6,13 @@
    over experiments */
 struct PackingParams {
   int compress; // perform compression, 1 for compression, 0 for not
-  int compress_mode;  /* Chose compression mode:
+  int deflate_level; // deflate level, 0-9
+  int shuffle; // use shuffle, 1 for yes, 0 for no
+  int compress_mode;  
+                /* Chose compression mode:
                     1) ZLIB
-                    2) ZSTD
-                    */
+                    2) ZSTD - not yet implemented
+                */
   int do_quantize; // perform quantization, 1 for quantization, 0 for not
   int netcdf_quantize_mode; /* Chose netcdf quantization mode, choices:
 			       1) NC_QUANTIZE_BITGROOM
@@ -33,6 +36,9 @@ struct PackingParams {
 };
 
 /* Define parameter sets */
+// Not sure if we want to continue manually writing tests or if we should programmatically generate them
+// For example, we might run all tests with shuffle on and off, or sweep all deflate levels over all quantization types etc
+// If I do want to test all config options possible, I will create a few lists of options and for-loops traversing each
 struct PackingParams *define_params() {
 
   //Allocate our array of parameters
@@ -47,7 +53,22 @@ struct PackingParams *define_params() {
   strcpy(param_array[0].filename, "reference.nc");
   strcpy(param_array[0].fieldname, "field");
 
-  // ZLIB set:
+//   Thinking about a param sweep loop:
+//   Indexing the params needs some thought.
+//   for (int i = 0; i < 2; i++) {  // Loop over compression modes
+//      char type = (i == 0) ? "zlib" : "zstd";
+//      for (int k = 0; k < 4; k++) { // Loop over quant modes
+//          char quant = (k == 0) ? "no_quant" : "quant";
+//          char quant_mode = (k == 1) ? "NC_QUANTIZE_BITGROOM" : (k == 2) ? "NC_QUANTIZE_GRANULARBR" : "NC_QUANTIZE_BITROUND";
+//          param_array[1].compress = 1;
+//          param_array[1].compress_mode = i;
+//          param_array[1].do_quantize = (k > 0) ? 1 : 0;
+//          param_array[1].netcdf_quantize_mode = k;
+//          int nsd = (k == 1) ? 3 : (k == 2) ? 3 : 10; // Recreating the original nsd values, we might want to sweep over these too
+//          param_array[1].netcdf_nsd = nsd
+//          strcpy(param_array[1].filename, "comp_{type}_{quant}_{quant_mode}_{nsd}.nc");
+//          strcpy(param_array[1].fieldname, "field");
+
   // Reference compress
   param_array[1].compress = 1;
   param_array[1].compress_mode = 1; // ZLIB

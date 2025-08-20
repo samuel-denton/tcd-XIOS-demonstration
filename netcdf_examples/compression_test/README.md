@@ -1,4 +1,6 @@
-# NetCDF quantize test
+# NetCDF compression test
+
+# Needs re-writing for compression
 
 The following test demonstrates the functionality of the NetCDF quantize feature, along with the deflate calls. This test requires NetCDF 4.9 or later. The choice of C rather than Fortran was made, as the C interface will be used for any applications within XIOS.  
 
